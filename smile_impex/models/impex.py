@@ -64,7 +64,7 @@ class IrModelImpexTemplate(models.Model):
                 'model': self._name,
                 'function': 'create_impex',
                 'args': '(%d, )' % self.id,
-                'numbercall':-1,
+                'numbercall': -1,
             }
             cron_id = self.env['ir.cron'].create(vals)
             self.write({'cron_id': cron_id})
