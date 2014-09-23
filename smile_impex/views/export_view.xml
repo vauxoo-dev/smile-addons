@@ -14,20 +14,24 @@
 								<field name="name" class="oe_inline" />
 							</h1>
 						</div>
-						<group colspan="4" col="4">
+						<group name="method" string="Method">
 							<field name="model_id" />
-						</group>
-						<group name="method" string="Method" colspan="2" col="2">
 							<field name="method" />
 							<field name="method_args" />
 						</group>
-						<group name="filter" string="Filters" colspan="2" col="2">
-							<field name="filter_type" />
-							<field name="filter_domain" attrs="{'invisible': [('filter_type', '!=', 'domain')]}" />
-							<field name="filter_method" attrs="{'invisible': [('filter_type', '!=', 'method')]}" />
-							<field name="limit" />
-							<field name="max_offset" />
-							<field name="order" />
+						<group>
+							<group name="filter" string="Filters">
+								<field name="filter_type" />
+								<field name="filter_domain" attrs="{'invisible': [('filter_type', '!=', 'domain')]}" />
+								<field name="filter_method" attrs="{'invisible': [('filter_type', '!=', 'method')]}" />
+							</group>
+							<group name="paging" string="Paging">
+								<field name="limit" />
+								<field name="max_offset" />
+								<field name="order" />
+							</group>
+						</group>
+						<group name="other" string="Other">
 							<field name="unique" />
 							<field name="force_execute_action" />
 						</group>
