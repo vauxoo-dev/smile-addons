@@ -76,4 +76,4 @@ class IrModelImport(models.Model, IrModelImpex):
     @with_new_cursor
     def _execute(self):
         model_obj = self.env[self.import_tmpl_id.model_id.model].browse()
-        getattr(model_obj, self.import_tmpl_id.method)(**eval(self.import_tmpl_id.method_args or {}))
+        getattr(model_obj, self.import_tmpl_id.method)(**eval(self.import_tmpl_id.method_args or '{}'))

@@ -157,4 +157,4 @@ class IrModelExport(models.Model, IrModelImpex):
         if record_ids or self.export_tmpl_id.force_execute_action:
             records = self.env[self.export_tmpl_id.model_id.model].browse(record_ids)
             if self.export_tmpl_id.method:
-                getattr(records, self.export_tmpl_id.method)(**eval(self.export_tmpl_id.method_args or {}))
+                getattr(records, self.export_tmpl_id.method)(**eval(self.export_tmpl_id.method_args or '{}'))
