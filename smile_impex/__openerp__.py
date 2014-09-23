@@ -29,6 +29,16 @@ Smile Impex
 
 WARNING: UNDER DEVELOPMENT
 
+Features
+
+    # Define an import/export template
+        # choose an object
+        # define a domain to filter lines to export
+    # Create actions to generate a new import/export
+        # a client action to generate an export on the fly
+        # a scheduled action to generate periodically a new import/export
+    # Log execution exceptions
+
 Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr & isabelle.richard@smile.fr
     """,
     "summary": "",
@@ -36,6 +46,9 @@ Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr & isabelle.richard@
     "category": 'Tools',
     "sequence": 20,
     "data": [
+        'views/export_view.xml',
+        'views/import_view.xml',
+        'views/menu_view.xml',
     ],
     "auto_install": False,
     "installable": True,
