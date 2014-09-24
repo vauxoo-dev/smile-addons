@@ -20,14 +20,16 @@
 ##############################################################################
 
 import logging
-from multiprocessing import Process
+from threading import Thread
 
 from openerp import api, fields, models, SUPERUSER_ID, _
 from openerp.exceptions import Warning
-from openerp.addons.smile_log.db_handler import SmileDBLogger
 from openerp.modules.registry import Registry
-from openerp.addons.smile_impex.tools.api import cursor, with_new_cursor
-from openerp.addons.smile_impex.tools.misc import s2human
+
+from openerp.addons.smile_log.tools import SmileDBLogger
+
+from ..tools.api import cursor, with_new_cursor
+from ..tools.misc import s2human
 
 _logger = logging.getLogger(__package__)
 
@@ -151,22 +153,23 @@ class IrModelImpex(models.AbstractModel):
     def process(self):
         self._cr.commit()
         for record in self:
-            p = Process(target=record._process)
-            p.start()
+            thread = Thread(target=self.pool[self._name]._process, args=(self._cr, self._uid, record.id, self._context))
+            thread.start()
         return True
 
-    @api.one
-    def _process(self):
-        self = self.with_context(logger=SmileDBLogger(self._cr.dbname, self._name, self.id, self._uid))
-        self.write_with_new_cursor({'state': 'running', 'from_date': fields.Datetime.now()})
-        try:
-            self._execute()
-            self.write_with_new_cursor({'state': 'done', 'to_date': fields.Datetime.now()})
-            if self.test_mode:
-                self._cr.rollback()
-        except Exception, e:
-            self._context['logger'].error(repr(e))
-            self.write_with_new_cursor({'state': 'exception', 'to_date': fields.Datetime.now()})
+    def _process(self, cr, uid, impex_id, context=None):
+        with api.Environment.manage():
+            context = context and context.copy() or {}
+            context['logger'] = SmileDBLogger(cr.dbname, self._name, impex_id, uid)
+            self.write_with_new_cursor(cr, uid, impex_id, {'state': 'running', 'from_date': fields.Datetime.now()}, context)
+            try:
+                self._execute(cr, uid, impex_id, context)
+                self.write_with_new_cursor(cr, uid, impex_id, {'state': 'done', 'to_date': fields.Datetime.now()}, context)
+                if self.browse(cr, uid, impex_id, context).test_mode:
+                    cr.rollback()
+            except Exception, e:
+                context['logger'].error(repr(e))
+                self.write_with_new_cursor(cr, uid, impex_id, {'state': 'exception', 'to_date': fields.Datetime.now()}, context)
 
     @api.one
     @with_new_cursor

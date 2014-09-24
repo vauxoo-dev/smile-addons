@@ -21,7 +21,8 @@
 
 from openerp import api, fields, models
 from openerp.modules.registry import Registry
-from openerp.addons.smile_log.db_handler import SmileDBLogger
+
+from openerp.addons.smile_log.tools import SmileDBLogger
 from openerp.addons.smile_impex.models.impex import IrModelImpex, IrModelImpexTemplate, state_cleaner
 from openerp.addons.smile_impex.tools.api import with_new_cursor
 
