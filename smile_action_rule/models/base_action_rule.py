@@ -21,9 +21,9 @@
 
 import inspect
 
-from openerp import api, fields, models, SUPERUSER_ID
+from openerp import api, fields, models, SUPERUSER_ID, tools
 
-from ..action_rule_decorator import action_rule_decorator
+from action_rule_decorator import action_rule_decorator
 
 
 class ActionRule(models.Model):

@@ -22,7 +22,7 @@
 import inspect
 
 from openerp import _
-from openerp.exception import Warning
+from openerp.exceptions import Warning
 
 
 def _get_args(self, method, args, kwargs):

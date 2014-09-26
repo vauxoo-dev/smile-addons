@@ -22,7 +22,7 @@
 from openerp import fields, models
 
 
-class IrModelMethods(orm.Model):
+class IrModelMethods(models.Model):
     _name = 'ir.model.methods'
     _description = 'Model Method'
     _order = 'name'

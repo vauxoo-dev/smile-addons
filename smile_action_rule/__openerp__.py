@@ -53,7 +53,7 @@ Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr
     "sequence": 20,
     "data": [
         "views/ir_model_methods_view.xml",
-        "views/base_action_rule_view.xml",* 
+        "views/base_action_rule_view.xml",
     ],
     "auto_install": False,
     "installable": True,
