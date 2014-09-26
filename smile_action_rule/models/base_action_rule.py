@@ -26,6 +26,13 @@ from openerp import api, fields, models, SUPERUSER_ID, tools
 from action_rule_decorator import action_rule_decorator
 
 
+class ActionRuleCategory(models.Model):
+    _name = 'base.action.rule.category'
+    _description = 'Action Rule Category'
+
+    name = fields.Char(size=64, required=True)
+
+
 class ActionRule(models.Model):
     _inherit = 'base.action.rule'
 
@@ -40,8 +47,11 @@ class ActionRule(models.Model):
             ('on_time', 'Based on Timed Condition'),
         ]
 
-    kind = fields.Selection('_get_kinds', 'When to Run'),
+    kind = fields.Selection('_get_kinds', string='When to Run')
     method_id = fields.Many2one('ir.model.methods', 'Method')
+    category_id = fields.Many2one('base.action.rule.category', 'Category')
+    max_executions = fields.Integer('Max executions', help="Number of time actions are runned")
+    force_actions_execution = fields.Boolean('Force actions execution when resources list is empty')
 
     @api.multi
     def _store_model_methods(self, model_id):
@@ -89,21 +99,28 @@ class ActionRule(models.Model):
             domain.insert(0, ('id', 'in', record_ids))
             ctx = dict(context or {})
             ctx.update(eval(filter.context))
-            return model.search(cr, uid, domain, context=ctx)
-        return super(ActionRule, self)._filter(cr, uid, rule, filter, record_ids, context)
+            res_ids = model.search(cr, uid, domain, context=ctx)
+        else:
+            res_ids = super(ActionRule, self)._filter(cr, uid, rule, filter, record_ids, context)
+        return rule._filter_max_executions(res_ids)
 
     def _process(self, cr, uid, rule, record_ids, context=None):
         # Force action execution even if records list is empty
-        if not record_ids and rule.server_action_ids:
+        if not record_ids and rule.server_action_ids and rule.force_actions_execution:
             action_server_obj = self.pool.get('ir.actions.server')
             ctx = dict(context, active_model=rule.model_id._name, active_ids=[], active_id=False)
+            server_action_ids = [act.id for act in rule.server_action_ids]
             action_server_obj.run(cr, uid, server_action_ids, context=ctx)
             return True
-        return super(ActionRule, self)._process(cr, uid, rule, record_ids, context)
+        res = super(ActionRule, self)._process(cr, uid, rule, record_ids, context)
+        # Update execution counters
+        if rule.max_executions:
+            rule._update_execution_counter(record_ids)
+        return res
 
     @api.multi
     def _get_method_names(self):
-        assert len(ids) == 1, 'ids must be a list with only one item!'
+        assert len(self) == 1, 'ids must be a list with only one item!'
         if self.kind == 'on_time':
             return []
         if self.kind == 'on_other_method' and self.method_id:
@@ -126,9 +143,10 @@ class ActionRule(models.Model):
                 while check:
                     if method.__name__ == 'action_rule_wrapper':
                         break
-                    if not hasattr(method, 'origin'):
+                    if hasattr(method, 'origin'):
+                        method = method.origin
+                    else:
                         check = False
-                    method = method.origin
                 else:
                     decorated_method = action_rule_decorator(getattr(model_obj, method_name))
                     model_obj._patch_method(method_name, decorated_method)
@@ -166,3 +184,37 @@ class ActionRule(models.Model):
     def _get_action_rules(self, method):
         method_name = ActionRule._get_method_name(method)
         return self._get_action_rules_by_method().get(method_name, [])
+
+    @api.one
+    def _update_execution_counter(self, res_ids):
+        if isinstance(res_ids, (int, long)):
+            res_ids = [res_ids]
+        exec_obj = self.env['base.action.rule.execution']
+        for res_id in res_ids:
+            execution = exec_obj.search([('rule_id', '=', self.id),
+                                         ('res_id', '=', res_id)], limit=1)
+            if execution:
+                execution.counter += 1
+            else:
+                exec_obj.create({'rule_id': self.id, 'res_id': res_id})
+        return True
+
+    @api.multi
+    def _filter_max_executions(self, res_ids):
+        assert len(self) == 1, 'This option should only be used for a single id at a time.'
+        if self.max_executions:
+            self._cr.execute("SELECT res_id FROM base_action_rule_execution WHERE rule_id=%s AND counter>=%s",
+                             (self.id, self.max_executions))
+            res_ids_off = [r[0] for r in self._cr.fetchall()]
+            res_ids = list(set(res_ids) - set(res_ids_off))
+        return res_ids
+
+
+class ActionRuleExecution(models.Model):
+    _name = 'base.action.rule.execution'
+    _description = 'Action Rule Execution'
+    _rec_name = 'rule_id'
+
+    rule_id = fields.Many2one('base.action.rule', 'Action rule', required=False, index=True, ondelete='cascade')
+    res_id = fields.Integer('Resource', required=False)
+    counter = fields.Integer('Executions', default=1)

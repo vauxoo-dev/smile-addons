@@ -19,7 +19,6 @@
 	        <field name="view_type">form</field>
 	        <field name="view_mode">tree</field>
 	        <field name="view_id" ref="view_ir_model_methods_tree"/>
-	        <field name="search_view_id" ref="view_ir_model_methods_search"/>
 	    </record>
 
 	    <menuitem id="menu_ir_model_methods_tree" parent="base.next_id_9"

@@ -20,7 +20,6 @@
 ##############################################################################
 
 from openerp import api, models, fields
-from openerp.tools import safe_eval as eval
 
 from ..tools import unquote
 
@@ -40,11 +39,10 @@ class ActionFilter(models.Model):
         action_domain = self._get_action_domain(cr, uid, action_id)
         filter_ids = self.search(cr, uid, action_domain + [
             ('model_id', '=', model),
-            ('user_id',' in', [uid, False]),
-            ('action_rule', '=', False),  # Added by Smile
+            ('user_id', 'in', (uid, False)),
+            ('action_rule', '=', False),
         ])
-        my_filters = self.read(cr, uid, filter_ids,
-            ['name', 'is_default', 'domain', 'context', 'user_id'])
+        my_filters = self.read(cr, uid, filter_ids, ['name', 'is_default', 'domain', 'context', 'user_id'])
         return my_filters
 
     @api.multi

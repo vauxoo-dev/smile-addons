@@ -27,23 +27,23 @@
     "description": """
 This module extends base_action_rule.
 
-Additional features - TODO
+Additional features
 
     * Extend action rules to:
         * Trigger on:
             * Other method
-            * Workflow activity
+            * Workflow activity - TODO
         * Limit executions per record
-        * Log executions
-        * Execute in test mode
-        * Raise customized exceptions
+        * Log executions - TODO
+        * Execute in test mode - TODO
+        * Raise customized exceptions - TODO
         * Categorize them
     * Extend filters to:
         * Allow to compare with other fields of object (in third item of a condition) => filter specific for action rule
     * Extend server actions to:
         * Run once for all records or grouped records - COMPLEX: native code provided to work with an unique rec_id
         * Force execution even if records list is empty
-        * Execute in asynchronous mode
+        * Execute in asynchronous mode - TODO
 
 Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr
     """,
