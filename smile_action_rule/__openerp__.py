@@ -52,6 +52,7 @@ Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr
     "category": 'Tools',
     "sequence": 20,
     "data": [
+        "security/ir.model.access.csv",
         "views/ir_model_methods_view.xml",
         "views/base_action_rule_view.xml",
     ],

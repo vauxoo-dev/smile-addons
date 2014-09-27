@@ -19,6 +19,8 @@
 #
 ##############################################################################
 
+import time
+
 from openerp import api, models, fields
 
 from ..tools import unquote
@@ -30,7 +32,9 @@ class ActionFilter(models.Model):
     @api.one
     @api.depends('domain')
     def _get_action_rule(self):
-        eval_domain = eval(self.domain.replace(' ', ''), {'object': unquote('object')})
+        localdict = {'object': unquote('object'), 'time': time,
+                     'active_id': unquote("active_id"), 'uid': self._uid}
+        eval_domain = eval(self.domain.replace(' ', ''), localdict)
         self.action_rule = ',object.' in eval_domain
 
     action_rule = fields.Boolean('Only for action rules', compute='_get_action_rule', store=True)

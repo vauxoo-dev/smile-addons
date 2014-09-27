@@ -13,6 +13,8 @@
                 <field name="kind" position="after">
                 	<field name="method_id" domain="[('model_id', '=', model_id)]"
                 		attrs="{'invisible': [('kind', '!=', 'on_other_method')], 'required': [('kind', '=', 'on_other_method')]}"/>
+                	<field name="activity_id" domain="[('wkf_id.osv', '=', model)]"
+                		attrs="{'invisible': [('kind', '!=', 'on_wkf_activity')], 'required': [('kind', '=', 'on_wkf_activity')]}"/>
                 </field>
                 <field name="filter_pre_id" position="attributes">
                 	<attribute name="attrs">{'invisible': [('kind', 'not in', ('on_write', 'on_unlink', 'on_other_method'))]}</attribute>

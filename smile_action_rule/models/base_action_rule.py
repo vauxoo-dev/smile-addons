@@ -36,6 +36,10 @@ class ActionRuleCategory(models.Model):
 class ActionRule(models.Model):
     _inherit = 'base.action.rule'
 
+    def __init__(self, pool, cr):
+        super(ActionRule, self).__init__(pool, cr)
+        self._columns['kind'].selection = self._get_kinds(cr, SUPERUSER_ID)
+
     @api.model
     def _get_kinds(self):
         return [
@@ -44,20 +48,22 @@ class ActionRule(models.Model):
             ('on_create_or_write', 'On Creation & Update'),
             ('on_unlink', 'On Deletion'),
             ('on_other_method', 'On Other Method'),
-            ('on_time', 'Based on Timed Condition'),
+            ('on_wkf_activity', 'On Workflow Activity'),
+            ('on_time', 'On Timed Condition'),
         ]
 
     kind = fields.Selection('_get_kinds', string='When to Run')
     method_id = fields.Many2one('ir.model.methods', 'Method')
+    activity_id = fields.Many2one('workflow.activity', 'Activity')
     category_id = fields.Many2one('base.action.rule.category', 'Category')
     max_executions = fields.Integer('Max executions', help="Number of time actions are runned")
     force_actions_execution = fields.Boolean('Force actions execution when resources list is empty')
 
     @api.multi
     def _store_model_methods(self, model_id):
-        obj = self.env[self.env['ir.model'].browse(model_id).model]
+        obj = self.env[self.env['ir.model'].sudo().browse(model_id).model]
         method_names = [attr for attr in dir(obj) if inspect.ismethod(getattr(obj, attr))]
-        method_obj = self.env['ir.model.methods']
+        method_obj = self.env['ir.model.methods'].sudo()
         existing_method_names = ['create', 'write', 'unlink']
         existing_method_names += [m['name'] for m in method_obj.search_read([('model_id', '=', model_id),
                                                                              ('name', 'in', method_names)], ['name'])]
@@ -82,7 +88,7 @@ class ActionRule(models.Model):
         clear_fields = []
         if kind in ['on_create', 'on_create_or_write']:
             clear_fields = ['filter_pre_id', 'trg_date_id', 'trg_date_range', 'trg_date_range_type']
-        elif kind in ['on_write', 'on_other_method']:
+        elif kind in ['on_write', 'on_other_method', 'on_wkf_activity']:
             clear_fields = ['trg_date_id', 'trg_date_range', 'trg_date_range_type']
         elif kind == 'on_time':
             clear_fields = ['filter_pre_id']
@@ -121,7 +127,7 @@ class ActionRule(models.Model):
     @api.multi
     def _get_method_names(self):
         assert len(self) == 1, 'ids must be a list with only one item!'
-        if self.kind == 'on_time':
+        if self.kind in ('on_time', 'on_wkf_activity'):
             return []
         if self.kind == 'on_other_method' and self.method_id:
             return (self.method_id.name,)
@@ -164,10 +170,10 @@ class ActionRule(models.Model):
         return method.__name__
 
     @tools.cache(skiparg=3)
-    @api.cr_uid
-    def _get_action_rules_by_method(self):
+    def _get_action_rules_by_method(self, cr, uid):
         res = {}
-        for rule in self.sudo().search([]):
+        rule_ids = self.search(cr, SUPERUSER_ID, [])
+        for rule in self.browse(cr, uid, rule_ids):
             if rule.kind == 'on_time':
                 continue
             if rule.kind in ('on_create', 'on_create_or_write'):
@@ -183,13 +189,26 @@ class ActionRule(models.Model):
     @api.model
     def _get_action_rules(self, method):
         method_name = ActionRule._get_method_name(method)
-        return self._get_action_rules_by_method().get(method_name, [])
+        return self.sudo()._get_action_rules_by_method().get(method_name, [])
+
+    @tools.cache(skiparg=3)
+    def _get_action_rules_by_activity(self, cr, uid):
+        res = {}
+        rule_ids = self.search(cr, SUPERUSER_ID, [])
+        for rule in self.browse(cr, uid, rule_ids):
+            if rule.kind == 'on_wkf_activity':
+                res.setdefault(rule.activity_id.id, []).append(rule)
+        return res
+
+    @api.model
+    def _get_action_rules_on_wkf(self, activity_id):
+        return self.sudo()._get_action_rules_by_activity().get(activity_id, [])
 
     @api.one
     def _update_execution_counter(self, res_ids):
         if isinstance(res_ids, (int, long)):
             res_ids = [res_ids]
-        exec_obj = self.env['base.action.rule.execution']
+        exec_obj = self.env['base.action.rule.execution'].sudo()
         for res_id in res_ids:
             execution = exec_obj.search([('rule_id', '=', self.id),
                                          ('res_id', '=', res_id)], limit=1)
