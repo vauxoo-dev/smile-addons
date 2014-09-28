@@ -55,12 +55,23 @@ class ActionRule(models.Model):
             ('on_time', 'On Timed Condition'),
         ]
 
+    kind = fields.Selection('_get_kinds', 'When to Run', required=True)
     method_id = fields.Many2one('ir.model.methods', 'Method')
     activity_id = fields.Many2one('workflow.activity', 'Activity')
     category_id = fields.Many2one('base.action.rule.category', 'Category')
     max_executions = fields.Integer('Max executions', help="Number of time actions are runned")
     force_actions_execution = fields.Boolean('Force actions execution when resources list is empty')
     log_ids = fields.One2many('smile.log', 'res_id', 'Logs', domain=[('model_name', '=', 'base.action.rule')], readonly=True)
+    exception_handling = fields.Selection([
+        ('continue', 'Ignore actions in exception'),
+        ('rollback', 'Rollback transaction'),
+    ], 'Exception Handling', required=True, default='rollback')
+    exception_warning = fields.Selection([
+        ('custom', 'Custom'),
+        ('native', 'Native'),
+        ('none', 'None'),
+    ], 'Exception Warning', required=True, default='native')
+    exception_message = fields.Char('Exception Message', size=256, translate=True, required=True)
 
     @api.multi
     def _store_model_methods(self, model_id):
@@ -122,6 +133,10 @@ class ActionRule(models.Model):
         except Exception, e:
             logger.error('[%s] Filter failed: %s,%s - Input records: %s%s'
                          % (pid, rule.name, filter.name, rule.model_id.model, tuple(record_ids)))
+            if rule.exception_handling == 'continue' or rule.exception_warning == 'none':
+                return []
+            if rule.exception_warning == 'custom':
+                raise Warning(rule.exception_message)
             raise e
 
     def _process(self, cr, uid, rule, record_ids, context=None):
@@ -130,29 +145,36 @@ class ActionRule(models.Model):
         logger.debug('[%s] Launching action: %s - Records: %s%s'
                      % (pid, rule.name, rule.model_id.model, tuple(record_ids)))
         try:
+            if context is None:
+                context = {}
             # Force action execution even if records list is empty
             if not record_ids and rule.server_action_ids and rule.force_actions_execution:
                 action_server_obj = self.pool.get('ir.actions.server')
                 ctx = dict(context, active_model=rule.model_id._name, active_ids=[], active_id=False)
                 server_action_ids = [act.id for act in rule.server_action_ids]
                 action_server_obj.run(cr, uid, server_action_ids, context=ctx)
-                return True
-            res = super(ActionRule, self)._process(cr, uid, rule, record_ids, context)
-            # Update execution counters
-            if rule.max_executions:
-                rule._update_execution_counter(record_ids)
-            return res
+                logger.time_info('[%s] Successful action: %s - Records: %s%s'
+                                 % (pid, rule.name, rule.model_id.model, tuple(record_ids)))
+            else:
+                super(ActionRule, self)._process(cr, uid, rule, record_ids, context)
+                # Update execution counters
+                if rule.max_executions:
+                    rule._update_execution_counter(record_ids)
+            logger.time_info('[%s] Successful action: %s - Records: %s%s'
+                             % (pid, rule.name, rule.model_id.model, tuple(record_ids)))
+            return True
         except Exception, e:
             logger.error('[%s] Action failed: %s - Records: %s%s - Error: %s'
                          % (pid, rule.name, rule.model_id.model, tuple(record_ids), repr(e)))
+            if rule.exception_handling == 'continue' or rule.exception_warning == 'none':
+                return True
+            if rule.exception_warning == 'custom':
+                raise Warning(rule.exception_message)
             raise e
-        else:
-            logger.time_info('[%s] Successful action: %s - Records: %s%s'
-                             % (pid, rule.name, rule.model_id.model, tuple(record_ids)))
 
     @api.multi
     def _get_method_names(self):
-        assert len(self) == 1, 'ids must be a list with only one item!'
+        assert len(self) == 1, 'This option should only be used for a single id at a time.'
         if self.kind in ('on_time', 'on_wkf_activity'):
             return []
         if self.kind == 'on_other_method' and self.method_id:

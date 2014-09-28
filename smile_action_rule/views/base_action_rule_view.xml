@@ -28,6 +28,18 @@
 	                	<field name="force_actions_execution"/>
 	                </group>
                 </field>
+                <field name="server_action_ids" position="after">
+                	<group colspan="4" col="4">
+	                	<field name="exception_handling"/>
+	                	<field name="exception_warning" attrs="{'invisible': [('exception_handling', '!=', 'rollback')]}"/>
+	                	<field name="exception_message" colspan="4" attrs="{'invisible': ['|', ('exception_handling', '!=', 'rollback'), ('exception_warning', '!=', 'custom')]}"/>
+	                </group>
+                </field>
+                <page string="Actions" position="after">
+                    <page string="Logs">
+                    	<field name="log_ids"/>
+                    </page>
+                </page>
             </field>
         </record>
 

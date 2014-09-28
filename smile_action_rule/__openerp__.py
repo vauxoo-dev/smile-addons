@@ -34,16 +34,19 @@ Additional features
             * Other method
             * Workflow activity
         * Limit executions per record
-        * Log executions
-        * Execute in test mode - TODO
-        * Raise customized exceptions - TODO
+        * Log executions for actions not on timed condition
+        * Raise customized exceptions
         * Categorize them
     * Extend filters to:
         * Allow to compare with other fields of object (in third item of a condition) => filter specific for action rule
     * Extend server actions to:
-        * Run once for all records or grouped records - COMPLEX: native code provided to work with an unique rec_id
         * Force execution even if records list is empty
-        * Execute in asynchronous mode - TODO
+        * Execute in asynchronous mode
+
+TODO
+
+    * Log executions for actions on timed condition
+    * Run once server actions for all records or grouped records - COMPLEX: native code provided to work with an unique record
 
 Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr
     """,
@@ -53,6 +56,8 @@ Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr
     "sequence": 20,
     "data": [
         "security/ir.model.access.csv",
+        "data/ir_cron_data.xml",
+        "views/ir_actions.xml",
         "views/ir_model_methods_view.xml",
         "views/base_action_rule_view.xml",
     ],
