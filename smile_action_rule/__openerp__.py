@@ -22,7 +22,7 @@
 {
     "name": "Automated Action Rules",
     "version": "0.1beta1",
-    "depends": ["base_action_rule", "email_template"],
+    "depends": ["base_action_rule", "email_template", "smile_log"],
     "author": "Smile",
     "description": """
 This module extends base_action_rule.
@@ -32,9 +32,9 @@ Additional features
     * Extend action rules to:
         * Trigger on:
             * Other method
-            * Workflow activity - TODO
+            * Workflow activity
         * Limit executions per record
-        * Log executions - TODO
+        * Log executions
         * Execute in test mode - TODO
         * Raise customized exceptions - TODO
         * Categorize them

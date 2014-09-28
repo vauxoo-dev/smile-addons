@@ -20,8 +20,11 @@
 ##############################################################################
 
 import inspect
+import os
 
 from openerp import api, fields, models, SUPERUSER_ID, tools
+
+from openerp.addons.smile_log.tools import SmileDBLogger
 
 from action_rule_decorator import action_rule_decorator
 
@@ -52,12 +55,12 @@ class ActionRule(models.Model):
             ('on_time', 'On Timed Condition'),
         ]
 
-    kind = fields.Selection('_get_kinds', string='When to Run')
     method_id = fields.Many2one('ir.model.methods', 'Method')
     activity_id = fields.Many2one('workflow.activity', 'Activity')
     category_id = fields.Many2one('base.action.rule.category', 'Category')
     max_executions = fields.Integer('Max executions', help="Number of time actions are runned")
     force_actions_execution = fields.Boolean('Force actions execution when resources list is empty')
+    log_ids = fields.One2many('smile.log', 'res_id', 'Logs', domain=[('model_name', '=', 'base.action.rule')], readonly=True)
 
     @api.multi
     def _store_model_methods(self, model_id):
@@ -97,32 +100,55 @@ class ActionRule(models.Model):
         return {'value': dict.fromkeys(clear_fields, False)}
 
     def _filter(self, cr, uid, rule, filter, record_ids, context=None):
-        # Allow to compare with other fields of object (in third item of a condition)
-        if record_ids and filter and filter.action_rule:
-            assert rule.model == filter.model_id, "Filter model different from action rule model"
-            model = self.pool[filter.model_id]
-            domain = filter._eval_domain(record_ids)
-            domain.insert(0, ('id', 'in', record_ids))
-            ctx = dict(context or {})
-            ctx.update(eval(filter.context))
-            res_ids = model.search(cr, uid, domain, context=ctx)
-        else:
-            res_ids = super(ActionRule, self)._filter(cr, uid, rule, filter, record_ids, context)
-        return rule._filter_max_executions(res_ids)
+        logger = SmileDBLogger(cr.dbname, self._name, rule.id, uid)
+        pid = os.getpid()
+        try:
+            # Allow to compare with other fields of object (in third item of a condition)
+            if record_ids and filter and filter.action_rule:
+                assert rule.model == filter.model_id, "Filter model different from action rule model"
+                model = self.pool[filter.model_id]
+                domain = filter._eval_domain(record_ids)
+                domain.insert(0, ('id', 'in', record_ids))
+                ctx = dict(context or {})
+                ctx.update(eval(filter.context))
+                res_ids = model.search(cr, uid, domain, context=ctx)
+            else:
+                res_ids = super(ActionRule, self)._filter(cr, uid, rule, filter, record_ids, context)
+            res_ids = rule._filter_max_executions(res_ids)
+            logger.debug('[%s] Successful filter: %s,%s - Input records: %s%s - Output records: %s%s'
+                         % (pid, rule.name, filter.name, rule.model_id.model, tuple(record_ids),
+                            rule.model_id.model, tuple(res_ids)))
+            return res_ids
+        except Exception, e:
+            logger.error('[%s] Filter failed: %s,%s - Input records: %s%s'
+                         % (pid, rule.name, filter.name, rule.model_id.model, tuple(record_ids)))
+            raise e
 
     def _process(self, cr, uid, rule, record_ids, context=None):
-        # Force action execution even if records list is empty
-        if not record_ids and rule.server_action_ids and rule.force_actions_execution:
-            action_server_obj = self.pool.get('ir.actions.server')
-            ctx = dict(context, active_model=rule.model_id._name, active_ids=[], active_id=False)
-            server_action_ids = [act.id for act in rule.server_action_ids]
-            action_server_obj.run(cr, uid, server_action_ids, context=ctx)
-            return True
-        res = super(ActionRule, self)._process(cr, uid, rule, record_ids, context)
-        # Update execution counters
-        if rule.max_executions:
-            rule._update_execution_counter(record_ids)
-        return res
+        logger = SmileDBLogger(cr.dbname, self._name, rule.id, uid)
+        pid = os.getpid()
+        logger.debug('[%s] Launching action: %s - Records: %s%s'
+                     % (pid, rule.name, rule.model_id.model, tuple(record_ids)))
+        try:
+            # Force action execution even if records list is empty
+            if not record_ids and rule.server_action_ids and rule.force_actions_execution:
+                action_server_obj = self.pool.get('ir.actions.server')
+                ctx = dict(context, active_model=rule.model_id._name, active_ids=[], active_id=False)
+                server_action_ids = [act.id for act in rule.server_action_ids]
+                action_server_obj.run(cr, uid, server_action_ids, context=ctx)
+                return True
+            res = super(ActionRule, self)._process(cr, uid, rule, record_ids, context)
+            # Update execution counters
+            if rule.max_executions:
+                rule._update_execution_counter(record_ids)
+            return res
+        except Exception, e:
+            logger.error('[%s] Action failed: %s - Records: %s%s - Error: %s'
+                         % (pid, rule.name, rule.model_id.model, tuple(record_ids), repr(e)))
+            raise e
+        else:
+            logger.time_info('[%s] Successful action: %s - Records: %s%s'
+                             % (pid, rule.name, rule.model_id.model, tuple(record_ids)))
 
     @api.multi
     def _get_method_names(self):
