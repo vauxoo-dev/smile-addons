@@ -1,0 +1,68 @@
+<openerp>
+	<data>
+
+		<report id="tests" model="ir.module.module" string="Tests report" report_type="qweb-pdf" name="smile_test_report.test_report_view"
+			file="Test report" attachment="(object.name)" />
+
+		<template id="test_report_view">
+			<t t-call="report.html_container">
+				<t t-foreach="docs" t-as="module">
+					<t t-call="report.external_layout">
+						<div class="page">
+
+							<title>Objects documentation</title>
+
+							<!-- YAML tests -->
+							<h1>YAML Tests</h1>
+							<p>
+								This document provides a detailed description of tests.
+							</p>
+							<t t-foreach="sum(docs.get_yaml_tests().values(), [])" t-as="test">
+								<h2>
+									Test:
+									<span t-esc="test[0]" />
+								</h2>
+								<p>
+									File:
+									<span t-esc="test[1]" />
+								</p>
+								<ol>
+									<t t-foreach="test[2]" t-as="comment">
+										<li>
+											<span t-esc="comment" />
+										</li>
+									</t>
+								</ol>
+							</t>
+
+							<!-- Unit tests -->
+							<h1>Unit Tests</h1>
+							<p>
+								This document provides a detailed description of tests.
+							</p>
+							<t t-foreach="sum(docs.get_unit_tests().values(), [])" t-as="test">
+								<h2>
+									Test:
+									<span t-esc="test[0]" />
+								</h2>
+								<p>
+									File:
+									<span t-esc="test[1]" />
+								</p>
+								<ol>
+									<t t-foreach="test[2]" t-as="comment">
+										<li>
+											<span t-esc="comment" />
+										</li>
+									</t>
+								</ol>
+							</t>
+
+						</div>
+					</t>
+				</t>
+			</t>
+		</template>
+
+	</data>
+</openerp>
