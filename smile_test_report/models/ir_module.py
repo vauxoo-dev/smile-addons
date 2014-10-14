@@ -25,6 +25,7 @@ import types
 import yaml
 
 from openerp import addons, api, models, modules
+from openerp.tests.common import BaseCase
 
 _logger = logging.getLogger(__package__)
 
@@ -33,7 +34,11 @@ class IrModuleModule(models.Model):
     _inherit = 'ir.module.module'
 
     @staticmethod
-    def _get_test_files(module_name, test_directory):
+    def _get_yaml_test_files(module_name):
+        """Returns the list of the paths indicated in 'test' of module manifest.
+        
+        @return: dict
+        """
         test_files_by_module_path = {}
         if hasattr(addons, module_name):
             module = getattr(addons, module_name)
@@ -42,13 +47,17 @@ class IrModuleModule(models.Model):
             if not os.path.exists(file_path):
                 _logger.error("No such file: %s", file_path)
             with open(file_path) as f:
-                tests = eval(f.read()).get(test_directory)
+                tests = eval(f.read()).get('test')
                 if tests:
                     test_files_by_module_path[module_path] = tests
         return test_files_by_module_path
 
     @staticmethod
     def _get_yaml_test_comments(test_files):
+        """Returns a list of tuple (basename of the file, path of the file, list of comments of the file).
+        
+        @return: list
+        """
         res = []
         for module_path in test_files:
             module = os.path.basename(module_path)
@@ -68,26 +77,64 @@ class IrModuleModule(models.Model):
         return res
 
     @staticmethod
-    def _get_unit_test_comments(test_files, dbname):
+    def _get_unit_test_comments(module_name):
+        """Returns a list of tuple (basename of the file, path of the file, list of comments of the file).
+        
+        @return: list
+        """
         res = []
-        for module_path in test_files:
-            module = os.path.basename(module_path)
-            modules.module.run_unit_tests(module, dbname)
-            # TODO: get test informations
+
+#         # Search module_name in addons_path
+#         test_dir = False
+#         for ad_path in modules.module.ad_paths:
+#             test_dir_tmp = os.path.join(ad_path, module_name, 'tests')
+#             if os.path.exists(test_dir_tmp):
+#                 test_dir = test_dir_tmp
+#         if not test_dir:
+#             return res
+#
+#         # Parse docstring of test files
+#         test_files = [name for name in os.listdir(test_dir)
+#             if not os.path.isdir(os.path.join(test_dir, name)) and name.endswith('.py') and not name.startswith('__')]
+#         for test_file in test_files:
+#             root, ext = os.path.splitext(test_file)
+#             module_import = __import__('openerp.addons.%s.tests' % module_name, fromlist=[str(root)])
+#             for module_attr in [elt for elt in dir(module_import) if not elt.startswith('__')]:
+#                 # In [28]: module_import.__getattribute__('TestReconciliation')
+#                 # Out[28]: test_reconciliation.TestReconciliation
+#                 #
+#                 # In [29]: dir(module_import.__getattribute__('TestReconciliation'))
+#
+#                 if module_attr == 'fast_suite':
+#                     continue  # TODO: remove
+#
+#                 for class_attr in [elt for elt in dir(module_import.__getattribute__(module_attr)) if not elt.startswith('__')]:
+#                     import pdb;pdb.set_trace()
+#
+#                 if isinstance(module_attr, type) and issubclass(module_attr, BaseCase):  # is a test class
+#                     comments = []
+#                     comments.append(module_attr.__doc__)  # class docstring
+#                     for class_attr in dir(module_attr):
+#                         if callable(class_attr) and class_attr.startswith('test'):  # is a test method
+#                             comments.append(class_attr.__doc__)  # method docstring
+#                     res.append((module_attr, os.path.join(test_dir, test_file), comments))
         return res
 
     @api.multi
-    def get_yaml_tests(self):
+    def get_tests(self):
+        """Returns the tests documentation of each module.
+        
+        @return: dict 
+        """
         tests_by_module = {}
         for module in self:
-            test_files = IrModuleModule._get_test_files(module.name, 'test')
-            tests_by_module[module.name] = IrModuleModule._get_yaml_test_comments(test_files)
-        return tests_by_module
-
-    @api.multi
-    def get_unit_tests(self):
-        tests_by_module = {}
-        for module in self:
-            test_files = IrModuleModule._get_test_files(module.name, 'tests')
-            tests_by_module[module.name] = IrModuleModule._get_unit_test_comments(test_files, self._cr.dbname)
+            tests = []
+            # YAML tests
+            test_files = IrModuleModule._get_yaml_test_files(module.name)
+            tests.extend(IrModuleModule._get_yaml_test_comments(test_files))
+            # Unit tests
+            tests.extend(IrModuleModule._get_unit_test_comments(module.name))
+            if tests:
+                # Add tests for this module
+                tests_by_module[module.name] = tests
         return tests_by_module

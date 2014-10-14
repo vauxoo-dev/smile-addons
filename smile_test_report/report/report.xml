@@ -13,34 +13,12 @@
 							<title>Objects documentation</title>
 
 							<!-- YAML tests -->
-							<h1>YAML Tests</h1>
+							<h1>Non-regression Tests</h1>
 							<p>
 								This document provides a detailed description of tests.
 							</p>
-							<t t-foreach="sum(docs.get_yaml_tests().values(), [])" t-as="test">
-								<h2>
-									Test:
-									<span t-esc="test[0]" />
-								</h2>
-								<p>
-									File:
-									<span t-esc="test[1]" />
-								</p>
-								<ol>
-									<t t-foreach="test[2]" t-as="comment">
-										<li>
-											<span t-esc="comment" />
-										</li>
-									</t>
-								</ol>
-							</t>
 
-							<!-- Unit tests -->
-							<h1>Unit Tests</h1>
-							<p>
-								This document provides a detailed description of tests.
-							</p>
-							<t t-foreach="sum(docs.get_unit_tests().values(), [])" t-as="test">
+							<t t-foreach="sum(docs.get_tests().values(), [])" t-as="test">
 								<h2>
 									Test:
 									<span t-esc="test[0]" />
@@ -49,13 +27,15 @@
 									File:
 									<span t-esc="test[1]" />
 								</p>
-								<ol>
-									<t t-foreach="test[2]" t-as="comment">
-										<li>
-											<span t-esc="comment" />
-										</li>
-									</t>
-								</ol>
+								<p>
+									<ol>
+										<t t-foreach="test[2]" t-as="comment">
+											<li>
+												<span t-esc="comment" />
+											</li>
+										</t>
+									</ol>
+								</p>
 							</t>
 
 						</div>
