@@ -25,7 +25,6 @@ import types
 import yaml
 
 from openerp import addons, api, models, modules
-from openerp.tests.common import BaseCase
 
 _logger = logging.getLogger(__package__)
 
@@ -36,7 +35,7 @@ class IrModuleModule(models.Model):
     @staticmethod
     def _get_yaml_test_files(module_name):
         """Returns the list of the paths indicated in 'test' of module manifest.
-        
+
         @return: dict
         """
         test_files_by_module_path = {}
@@ -55,7 +54,7 @@ class IrModuleModule(models.Model):
     @staticmethod
     def _get_yaml_test_comments(test_files):
         """Returns a list of tuple (basename of the file, path of the file, list of comments of the file).
-        
+
         @return: list
         """
         res = []
@@ -79,52 +78,36 @@ class IrModuleModule(models.Model):
     @staticmethod
     def _get_unit_test_comments(module_name):
         """Returns a list of tuple (basename of the file, path of the file, list of comments of the file).
-        
+
         @return: list
         """
         res = []
 
-#         # Search module_name in addons_path
-#         test_dir = False
-#         for ad_path in modules.module.ad_paths:
-#             test_dir_tmp = os.path.join(ad_path, module_name, 'tests')
-#             if os.path.exists(test_dir_tmp):
-#                 test_dir = test_dir_tmp
-#         if not test_dir:
-#             return res
-#
-#         # Parse docstring of test files
-#         test_files = [name for name in os.listdir(test_dir)
-#             if not os.path.isdir(os.path.join(test_dir, name)) and name.endswith('.py') and not name.startswith('__')]
-#         for test_file in test_files:
-#             root, ext = os.path.splitext(test_file)
-#             module_import = __import__('openerp.addons.%s.tests' % module_name, fromlist=[str(root)])
-#             for module_attr in [elt for elt in dir(module_import) if not elt.startswith('__')]:
-#                 # In [28]: module_import.__getattribute__('TestReconciliation')
-#                 # Out[28]: test_reconciliation.TestReconciliation
-#                 #
-#                 # In [29]: dir(module_import.__getattribute__('TestReconciliation'))
-#
-#                 if module_attr == 'fast_suite':
-#                     continue  # TODO: remove
-#
-#                 for class_attr in [elt for elt in dir(module_import.__getattribute__(module_attr)) if not elt.startswith('__')]:
-#                     import pdb;pdb.set_trace()
-#
-#                 if isinstance(module_attr, type) and issubclass(module_attr, BaseCase):  # is a test class
-#                     comments = []
-#                     comments.append(module_attr.__doc__)  # class docstring
-#                     for class_attr in dir(module_attr):
-#                         if callable(class_attr) and class_attr.startswith('test'):  # is a test method
-#                             comments.append(class_attr.__doc__)  # method docstring
-#                     res.append((module_attr, os.path.join(test_dir, test_file), comments))
+        module_tests = modules.module.get_test_modules(module_name)
+        for module_test in module_tests:
+            module_test_file = module_test.__file__[:-1]  # convert extension from .pyc to .py
+            root, ext = os.path.splitext(os.path.basename(module_test_file))
+            module_classes = [module_test.__getattribute__(attr) for attr in module_test.__dict__
+                              if isinstance(module_test.__getattribute__(attr), type)]
+            for module_class in module_classes:
+                comments = []
+                test_methods = [module_class.__dict__[attr] for attr in module_class.__dict__
+                                if callable(module_class.__dict__[attr]) and attr.startswith('test')]
+                if not test_methods:
+                    continue
+                comments.append(module_class.__dict__['__doc__'])  # class docstring
+                for test_method in test_methods:
+                    comment = '%s: %s' % (test_method.__name__, test_method.__doc__ or '')  # method name and docstring
+                    comments.append(comment)
+                res.append((root, module_test_file, comments))
+
         return res
 
     @api.multi
     def get_tests(self):
         """Returns the tests documentation of each module.
-        
-        @return: dict 
+
+        @return: dict
         """
         tests_by_module = {}
         for module in self:

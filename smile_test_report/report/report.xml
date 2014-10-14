@@ -2,20 +2,17 @@
 	<data>
 
 		<report id="tests" model="ir.module.module" string="Tests report" report_type="qweb-pdf" name="smile_test_report.test_report_view"
-			file="Test report" attachment="(object.name)" />
+			file="Non-regression test report" attachment="(object.name)" />
 
 		<template id="test_report_view">
 			<t t-call="report.html_container">
 				<t t-foreach="docs" t-as="module">
 					<t t-call="report.external_layout">
-						<div class="page">
+						<div class="page" style="margin-left: 3em">
 
-							<title>Objects documentation</title>
-
-							<!-- YAML tests -->
 							<h1>Non-regression Tests</h1>
 							<p>
-								This document provides a detailed description of tests.
+								This document provides a detailed description of non-regression tests.
 							</p>
 
 							<t t-foreach="sum(docs.get_tests().values(), [])" t-as="test">

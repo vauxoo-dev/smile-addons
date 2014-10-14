@@ -30,11 +30,19 @@ Test Report
 
 Features
 
-    # Parses YAML tests and export doctstrings.
+    # Generates a report of non-regression tests for selected modules.
+
+    # Example:
+        # Test: account_test_users
+        # File: account/test/account_test_users.yml
+        # 1. Create a user as 'Accountant'
+        # 2. I added groups for Accountant.
+        # 3. Create a user as 'Financial Manager'
+        # 4. I added groups for Financial Manager.
 
 TODO
 
-    # Parse Unit tests
+    # Improve QWeb report
     """,
     "depends": ['report_webkit'],
     "init_xml": [],
