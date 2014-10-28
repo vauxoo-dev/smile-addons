@@ -27,6 +27,7 @@
 					<field name="name" />
 					<field name="object_id" />
 					<field name="domain" />
+					<field name="xml_file" />
 				</tree>
 			</field>
 		</record>
@@ -38,11 +39,10 @@
 			<field name="arch" type="xml">
 				<form string="smile_csv2xml_converter" version="7.0">
 					<header>
-						<button type="object" name="fill" string="Fill model"/>  
-						<button type="object" name="createXML" string="Generate XML"/>
-						<button type="action" string="Import CSV file" name='%(action_wizard_upload)d'  /> 
-						<!-- <button type="object" string="Import CSV file" name='upcsvfile'  /> -->
-						<button type="object" name="fillcsv" string="Fill with CSV"/>
+						<!-- <button type="object" name="fill" string="Fill model" /> -->
+						<!-- <button type="object" name="createXML" string="Generate XML" /> -->
+						<!-- <button type="action" string="Import CSV file" name='%(action_wizard_upload)d' 
+							/> -->
 					</header>
 					<group colspan="4" col="4">
 						<group>
@@ -53,12 +53,42 @@
 							<field name="domain" />
 						</group>
 					</group>
-					<group string="Modele XML" colspan="4">
-						<field name="model_xml" nolabel="1" />
-						<field name="xml_file"/>
-					</group>
 
 
+					<notebook position="inside">
+
+						<page string="Fields">
+							<group>
+								<group>
+									<button type="object" string="Generate fields from object"
+										name="fillFromObj" />
+									<button type="action" string="Generate fields from CSV"
+										name="%(action_wizard_upload)d" />
+								</group>
+								<field name="field_ids" />
+							</group>
+						</page>
+
+						<page string="Model generation">
+							<group>
+								<button type="object" string="Generate model from fields"
+									name="fieldGeneration" />
+							</group>
+							<group string="Modele XML">
+								<field name="model_xml" nolabel="1" />
+							</group>
+						</page>
+
+						<page string="Model filled">
+							<group>
+								<button type="object" string="Generate XML" name="createXML" />
+							</group>
+							<group string="Modele XML">
+								<field name="model_xml2" nolabel="1" />
+							</group>
+						</page>
+
+					</notebook>
 				</form>
 			</field>
 		</record>

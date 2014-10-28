@@ -40,41 +40,43 @@ class WizardUpload(models.TransientModel):
     csv2xml_converter_id = fields.Many2one('smile.csv2xml.converter', default=_get_csv2xml_converter)
 
     @api.multi
-    def fillcsv(self):
+    def fillFromCsv(self):
         self.ensure_one()
         csv2xml_converter = self.csv2xml_converter_id
-#         print self.csv_file
-        listCSV = set([])
-        listOBJ = set([])
-#         print self.csv_file
+        listCSV = []
+        listOBJ = []
         cr = base64.decodestring(self.csv_file)
-#         print cr
         csv_input = cStringIO.StringIO(cr)
-#         print csv_input
-#         line1 = cr.next()
         csv_read = csv.reader(csv_input)
-        print csv2xml_converter.id
         self.env['smile.csv2xml.converter'].browse(csv2xml_converter.id).write({'file_origin': self.csv_file})
         line = csv_read.next()
         for i in line:
-            listCSV.add(i)
+            listCSV.append(i)
         for field in csv2xml_converter.object_id.field_id:
-            listOBJ.add(field.name)
-#         print listCSV
-#         print listOBJ
-        diff = listCSV - listOBJ
+            listOBJ.append(field.name)
+        diff = list(set(listCSV) - set(listOBJ))
+        print diff
         if not diff:
-            model_xml = "<record id='##?##' model='%s'>\n" % csv2xml_converter.object_id.model
-            for field in csv2xml_converter.object_id.field_id:
-                if (field.ttype == "function" or field.ttype == "related" or field.name == "id"):
-                    model_xml += ""
-                elif (field.ttype == "many2one"):
-                    model_xml += "            <field name='%s' ref=\"##?##\"/>\n" % field.name
-                elif (field.ttype == "many2many" or field.ttype == "one2many"):
-                    model_xml += "            <field name='%s' eval=\"##6##\"/>\n" % field.name
-                else:
-                    model_xml += "            <field name='%s'>##?##</field>\n" % field.name
-            model_xml += "</record>\n"
+            model_xml = "        <record id='##?##' model='%s'>\n" % csv2xml_converter.object_id.model
+            for j in listCSV:
+                for field in csv2xml_converter.object_id.field_id:
+                    if j == field.name:
+                        if (field.ttype == "function" or field.ttype == "related" or field.name == "id"):
+                            model_xml += ""
+                        elif (field.ttype == "many2one"):
+                            model_xml += "            <field name='%s' ref=\"##?##\"/>\n" % field.name
+                        elif (field.ttype == "many2many" or field.ttype == "one2many"):
+                            model_xml += "            <field name='%s' eval=\"##6##\"/>\n" % field.name
+                        else:
+                            model_xml += "            <field name='%s'>##?##</field>\n" % field.name
+            model_xml += "        </record>\n\n"
             csv2xml_converter.model_xml = model_xml
+            csv2xml_converter.field_ids = [[6, False, []]]
+            listcsv2 = []
+            if csv2xml_converter.object_id:
+                model_id = csv2xml_converter.object_id.id
+                for i in listCSV:
+                    listcsv2 += self.env['ir.model.fields'].search([('name', '=', i), ('model_id', '=', model_id)]).ids
+            csv2xml_converter.field_ids = [[6, False, listcsv2]]
         else:
             raise Warning(_("Difference between CSV file and object"))

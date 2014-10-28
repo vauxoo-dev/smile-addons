@@ -9,7 +9,7 @@
 				    <group><field name="csv_file"/> </group>
 					<label string="Upload here your CSV file" />
 					<footer>
-						<button name="fillcsv" string="fill with csv" type="object" class="oe_highlight"/>
+						<button name="fillFromCsv" string="fill with csv" type="object" class="oe_highlight"/>
 						<!-- <button name="Cancel" special="cancel" class="oe_link"/> -->
 					</footer>
 				</form>
