@@ -65,42 +65,6 @@ class SmileCsv2xmlConverter(models.Model):
 
         self.csv_result = self.get_xml_record(xml_fields, csv_line, object_field)
 
-# #         print self.object_field
-#         for k in self.xml_fields:
-#             print k
-
-#         modelsplit = self.model_xml.split('\n')
-#         print modelsplit
-#         for field in self.xml_fields:
-#             for line in modelsplit:
-#                 if field in line:
-# #                     print "field %s in %s " "ok" % (field, line)
-
-#         xmlgenerated = "<?xml version='1.0' encoding='utf-8'?>\n"
-#         xmlgenerated += "    <openerp>\n"
-#         xmlgenerated += "        <data noupdate='1'>\n"
-#         for dicline in csv_line:
-#             xmlgenerated += "            <record id='%s' model='%s'>\n" % (dicline['id'], self.object_id.model)
-#             for field in self.field_ids:
-#                 diclinesplitted = dicline[field.name].split(',')
-#                 if (field.ttype == "function" or field.ttype == "related" or field.name == "id"):
-#                     xmlgenerated += ""
-#                 elif (field.ttype == "many2one"):
-#                     xmlgenerated += "                <field name='%s' ref='%s' />\n" % (field.name, dicline[field.name])
-#                 elif (field.ttype == "many2many" or field.ttype == "one2many"):
-#                     tmpxml6 = "                <field name='%s' eval=\"[(6,0,[ref('%s')" % (field.name, diclinesplitted[0])
-#                     for i in range(1, len(diclinesplitted)):
-#                         tmpxml6 += ",ref('%s')" % diclinesplitted[i]
-#                     tmpxml6 += "])]\"/>\n"
-#                     xmlgenerated += tmpxml6
-#                 else:
-#                     xmlgenerated += "                <field name='%s'> %s </field>\n" % (field.name, dicline[field.name])
-#             xmlgenerated += "            </record>\n"
-#         xmlgenerated += "    </data>\n"
-#         xmlgenerated += "</openerp>"
-#         self.model_xml2 = xmlgenerated
-#         self.xml_file = base64.encodestring(self.model_xml2)
-
     @api.multi
     def fieldGeneration(self):
         self.ensure_one()
@@ -111,11 +75,10 @@ class SmileCsv2xmlConverter(models.Model):
             elif (field.ttype == "many2one"):
                 model_xml += "        <field name='%s' ref='##?##'/>\n" % field.name
             elif (field.ttype == "many2many" or field.ttype == "one2many"):
-                model_xml += "        <field name='%s' eval='##6##'/>\n" % field.name
+                model_xml += "        <field name='%s' eval=\"##6##\"/>\n" % field.name
             else:
                 model_xml += "        <field name='%s'>##?##</field>\n" % field.name
         model_xml += "</record>\n"
-#         self.object_field.update({field.name:field.ttype})
         self.model_xml = model_xml
 
     def get_xml_record(self, xml_fields, csv_line, object_field):
@@ -162,3 +125,4 @@ class SmileCsv2xmlConverter(models.Model):
         xmlgenerated += "</data>\n"
         xmlgenerated += "</openerp>"
         self.model_xml2 = xmlgenerated
+        self.xml_file = base64.encodestring(self.model_xml2)

@@ -77,4 +77,3 @@ msgstr ""
 #: view:smile_csv2xml_converter:smile_csv2xml_converter.view_smile_csv2xml_converter_tree
 msgid "smile_csv2xml_converter"
 msgstr ""
-
