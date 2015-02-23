@@ -24,6 +24,7 @@ import base64
 import cStringIO
 
 from openerp import models, api, _, fields
+from openerp.tools import ustr
 
 
 class WizardUpload(models.TransientModel):
@@ -45,17 +46,17 @@ class WizardUpload(models.TransientModel):
         csv2xml_converter = self.csv2xml_converter_id
         listCSV = []
         listOBJ = []
-        cr = base64.decodestring(self.csv_file)
+        csv_file = self.csv_file.encode('utf-8')
+        cr = base64.decodestring(ustr(csv_file))
         csv_input = cStringIO.StringIO(cr)
         csv_read = csv.reader(csv_input)
-        self.env['smile.csv2xml.converter'].browse(csv2xml_converter.id).write({'file_origin': self.csv_file})
+        self.env['smile.csv2xml.converter'].browse(csv2xml_converter.id).write({'file_origin': ustr(csv_file)})
         line = csv_read.next()
         for i in line:
             listCSV.append(i)
         for field in csv2xml_converter.object_id.field_id:
             listOBJ.append(field.name)
         diff = list(set(listCSV) - set(listOBJ))
-        print diff
         if not diff:
             model_xml = "        <record id='##?##' model='%s'>\n" % csv2xml_converter.object_id.model
             for j in listCSV:

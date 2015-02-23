@@ -23,6 +23,7 @@ import csv
 import base64
 
 from openerp import models, fields, api
+from openerp.tools import ustr
 
 # import pdb;pdb.set_trace()
 
@@ -46,7 +47,6 @@ class SmileCsv2xmlConverter(models.Model):
         field_ids = []
         if self.object_id:
             field_ids = self.env['ir.model.fields'].search([('model_id', '=', self.object_id.id)]).ids
-            print field_ids
         self.field_ids = [[6, False, field_ids]]
 
     @api.multi
@@ -89,7 +89,7 @@ class SmileCsv2xmlConverter(models.Model):
         # For each line in CSV file
         for dicline in csv_line:
             modelxml = self.model_xml
-            xmlgenerated += "<record id='%s' model='%s'>\n" % (dicline['id'], self.object_id.model)
+            xmlgenerated += ustr("<record id='%s' model='%s'>\n" % (ustr(dicline['id']), ustr(self.object_id.model)))
             # For each field (name) in the first tab
             for field in xml_fields:
                 # Split the col with the index name given
@@ -103,26 +103,26 @@ class SmileCsv2xmlConverter(models.Model):
                         if (object_field[field] == "function" or object_field[field] == "related"):
                             xmlgenerated += ""
                         elif object_field[field] == "many2one":
-                            modelxml = modelLine.replace("##?##", dicline[field], 1)
+                            modelxml = modelLine.replace("##?##", ustr(dicline[field]), 1)
                         elif (object_field[field] == "many2many" or object_field[field] == "one2many"):
                             if "##6##" in modelLine:
                                 tmp6 = "[(6,0,[ref('%s')" % diclinesplitted[0]
                                 for i in range(1, len(diclinesplitted)):
                                     tmp6 += ",ref('%s')" % diclinesplitted[i]
                                 tmp6 += "])]"
-                                modelxml = modelLine.replace("##6##", tmp6, 1)
+                                modelxml = modelLine.replace("##6##", ustr(tmp6), 1)
                             elif "##4##" in modelLine:
                                 tmp4 = "[(4,ref('%s'))" % diclinesplitted[0]
                                 for j in range(1, len(diclinesplitted)):
                                     tmp4 += ",(4,ref('%s'))" % diclinesplitted[j]
                                 tmp4 += "]"
-                                modelxml = modelLine.replace("##4##", tmp4, 1)
+                                modelxml = modelLine.replace("##4##", ustr(tmp4), 1)
                         else:
-                            modelxml = modelLine.replace("##?##", dicline[field], 1)
+                            modelxml = ustr(modelLine.replace("##?##", ustr(dicline[field]), 1))
                         xmlgenerated += modelxml
                         xmlgenerated += "\n"
             xmlgenerated += "</record>\n"
         xmlgenerated += "</data>\n"
         xmlgenerated += "</openerp>"
         self.model_xml2 = xmlgenerated
-        self.xml_file = base64.encodestring(self.model_xml2)
+        self.xml_file = ustr(base64.encodestring(self.model_xml2.encode('utf-8')))
