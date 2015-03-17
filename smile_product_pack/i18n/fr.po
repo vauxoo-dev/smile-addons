@@ -18,7 +18,7 @@ msgstr ""
 #. module: smile_product_pack
 #: view:product.product:0
 msgid "Product Configuration"
-msgstr "Articles composés"
+msgstr "Article composé"
 
 #. module: smile_product_pack
 #: view:product.pack.line:0
