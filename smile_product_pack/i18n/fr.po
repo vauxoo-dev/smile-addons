@@ -1,0 +1,180 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+#	* smile_product_pack
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 7.0-20131203-002409\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-01-20 22:51+0000\n"
+"PO-Revision-Date: 2014-01-20 22:51+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: smile_product_pack
+#: view:product.product:0
+msgid "Product Configuration"
+msgstr "Articles composés"
+
+#. module: smile_product_pack
+#: view:product.pack.line:0
+msgid "qty"
+msgstr "Quantité"
+
+#. module: smile_product_pack
+#: view:product.product:0
+msgid "{'readonly':['&',('product_type_compo','=','composed'),('product_type_price_compo','=',True)]}"
+msgstr "{'readonly':['&',('product_type_compo','=','composed'),('product_type_price_compo','=',True)]}"
+
+#. module: smile_product_pack
+#: model:ir.model,name:smile_product_pack.model_product_product
+msgid "Product"
+msgstr "Article"
+
+#. module: smile_product_pack
+#: code:addons/smile_product_pack/product.py:166
+#, python-format
+msgid "You can not delete a product which is a component of one or more products.\n"
+" product ids : '%s'."
+msgstr "Vous ne pouvez pas supprimer un article qui est le composant d'un autre.\n"
+" Articles : '%s'."
+
+#. module: smile_product_pack
+#: view:product.pack.line:0
+msgid "Pack Product Lines"
+msgstr "Lignes des composants"
+
+#. module: smile_product_pack
+#: code:addons/smile_product_pack/product.py:46
+#: selection:product.product,product_type_compo:0
+#, python-format
+msgid "Normal"
+msgstr "Normal"
+
+#. module: smile_product_pack
+#: model:res.groups,name:smile_product_pack.group_product_pack_user
+msgid "Pack User"
+msgstr "Produits composés utilisateur"
+
+#. module: smile_product_pack
+#: model:ir.model.fields,field_description:smile_product_pack.field_product_product_product_type_compo
+#: field:product.product,product_type_compo:0
+msgid "Package Type"
+msgstr "Conditionnement"
+
+#. module: smile_product_pack
+#: code:addons/smile_product_pack/product.py:237
+#, python-format
+msgid "You can not add a component which is the product itself, named : '%s'."
+msgstr "Vous ne pouvez pas ajouter un composant qui se trouve être l'artcile lui même, nom : '%s'."
+
+#. module: smile_product_pack
+#: model:ir.model,name:smile_product_pack.model_product_pack_line
+msgid "product.pack.line"
+msgstr "product.pack.line"
+
+#. module: smile_product_pack
+#: model:ir.module.category,name:smile_product_pack.products_pack_category
+msgid "Product Pack"
+msgstr "Article Composé"
+
+#. module: smile_product_pack
+#: model:ir.model.fields,field_description:smile_product_pack.field_product_product_product_type_price_compo
+#: field:product.product,product_type_price_compo:0
+msgid "Sale Price Depends of its Components"
+msgstr "Le prix de vente de base dépend de ses composants"
+
+#. module: smile_product_pack
+#: code:addons/smile_product_pack/product.py:88
+#, python-format
+msgid "You can not change field\n"
+"'Sale Price Depends of its Components',\n"
+"because this product is a component of some other products.\n"
+" product ids : '%s'."
+msgstr "Vous ne pouvez pas modifier le champs\n"
+"'Le prix dépend de ses composants',\n"
+"car cet article est le composant d'autres articles.\n"
+" Articles : '%s'."
+
+#. module: smile_product_pack
+#: code:addons/smile_product_pack/product.py:88
+#: code:addons/smile_product_pack/product.py:166
+#: code:addons/smile_product_pack/product.py:193
+#: code:addons/smile_product_pack/product.py:227
+#: code:addons/smile_product_pack/product.py:237
+#, python-format
+msgid "Error!"
+msgstr "Erreur!"
+
+#. module: smile_product_pack
+#: code:addons/smile_product_pack/product.py:193
+#: code:addons/smile_product_pack/product.py:227
+#, python-format
+msgid "You can not add a component which is a composed product which price depends of its components, named : '%s'."
+msgstr "Vous ne pouvez pas ajouter un article qui est de type composé et dont le prix dépend des ses composants : '%s'."
+
+#. module: smile_product_pack
+#: help:product.product,product_type_price_compo:0
+msgid "if checked, price depends of its components"
+msgstr "Si coché, le prix dépend de ses composants"
+
+#. module: smile_product_pack
+#: model:ir.model.fields,field_description:smile_product_pack.field_product_pack_line_quantity
+#: field:product.pack.line,quantity:0
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: smile_product_pack
+#: code:addons/smile_product_pack/product.py:46
+#: selection:product.product,product_type_compo:0
+#, python-format
+msgid "Composed"
+msgstr "Composé"
+
+#. module: smile_product_pack
+#: model:ir.model.fields,field_description:smile_product_pack.field_product_product_pack_line_ids
+#: view:product.product:0
+#: field:product.product,pack_line_ids:0
+msgid "Pack Products"
+msgstr "Composants"
+
+#. module: smile_product_pack
+#: model:ir.model.fields,field_description:smile_product_pack.field_product_pack_line_list_price_compo
+#: model:ir.model.fields,field_description:smile_product_pack.field_product_product_public_price
+#: field:product.pack.line,list_price_compo:0
+#: field:product.product,public_price:0
+#: help:product.product,public_price:0
+msgid "Sale Price"
+msgstr "Prix de Vente"
+
+#. module: smile_product_pack
+#: model:res.groups,name:smile_product_pack.group_product_pack_manager
+msgid "Pack Manager"
+msgstr "Produits composés responsable"
+
+#. module: smile_product_pack
+#: model:ir.model.fields,field_description:smile_product_pack.field_product_pack_line_parent_product_id
+#: field:product.pack.line,parent_product_id:0
+msgid "Parent Product"
+msgstr "Article parent"
+
+#. module: smile_product_pack
+#: view:product.pack.line:0
+msgid "Pack Product Line"
+msgstr "Lignes des composants"
+
+#. module: smile_product_pack
+#: model:ir.model.fields,field_description:smile_product_pack.field_product_pack_line_product_id
+#: field:product.pack.line,product_id:0
+msgid "Product Composant Name"
+msgstr "Nom de l'article"
+
+#. module: smile_product_pack
+#: help:product.product,pack_line_ids:0
+msgid "List of products that are part of this pack."
+msgstr "Liste des articles qui font partie de l'article composé"
+

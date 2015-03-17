@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<openerp>
+    <data>
+    
+    <!-- product.product -->
+        
+	<record id="product_product_pack_form" model="ir.ui.view">
+		<field name="name">product.product.pack.form</field>
+		<field name="model">product.product</field>
+		<field name="type">form</field>
+		<field name="inherit_id" ref="product.product_normal_form_view" />
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='lst_price']" position="attributes">
+			    <attribute name="attrs">{'readonly':['&amp;',('product_type_compo','=','composed'),('product_type_price_compo','=',True)]}</attribute> 
+			</xpath>
+            <notebook position="inside">
+				<page string="Product Configuration" groups="smile_product_pack.group_product_pack_user,smile_product_pack.group_product_pack_manager">
+				    <group colspan="4" col="4">
+				        <field name="product_type_compo" colspan="2"/>
+				        <field name="product_type_price_compo" colspan="2" attrs="{'invisible':[('product_type_compo','=','normal')]}"/>
+				    </group>
+				    <group attrs="{'invisible':[('product_type_compo','!=','composed')]}">
+					    <separator string="Pack Products" colspan="4"/>
+					    <group>
+					        <field name="pack_line_ids" colspan="4" nolabel="1">
+			                    <form string="Pack Product Line">
+				                    <field name="quantity"/>
+				                    <field name="product_id" domain="['|',('product_type_compo','=','normal'),('product_type_price_compo','=',False)]"/>
+				                    <field name="list_price_compo" readonly="True"/>
+			                    </form>
+			                    <tree string="Pack Product Lines" editable="bottom">
+				                    <field name="product_id" domain="['|',('product_type_compo','=','normal'),('product_type_price_compo','=',False)]"/>
+				                    <field name="quantity" string="qty"/>
+				                    <field name="list_price_compo" readonly="True"/>
+				                    <field name="calc_price"/>
+			                    </tree>
+			                </field>
+					    </group>
+				    </group>
+				</page>
+            </notebook>      
+		</field>
+	</record>
+				
+				
+	<!-- product.pack.line -->
+	
+	<record model="ir.ui.view" id="product_pack_line_form">
+		<field name="name">product.pack.line.form</field>
+		<field name="model">product.pack.line</field>
+		<field name="type">form</field>
+		<field name="arch" type="xml">
+			<form string="Pack Product Line">
+				<field name="quantity"/>
+				<field name="product_id" domain="['|',('product_type_compo','=','normal'),('product_type_price_compo','=',False)]"/>
+				<field name="list_price_compo"/>
+			</form>
+		</field>
+	</record>
+	
+	<record model="ir.ui.view" id="product_pack_line_tree">
+		<field name="name">product.pack.line.tree</field>
+		<field name="model">product.pack.line</field>
+		<field name="type">tree</field>
+		<field name="arch" type="xml">
+			<tree string="Pack Product Lines" editable="bottom">
+				<field name="product_id" domain="['|',('product_type_compo','=','normal'),('product_type_price_compo','=',False)]"/>
+				<field name="quantity" string="qty"/>
+				<field name="list_price_compo"/>
+			</tree>
+		</field>
+	</record>
+	
+        
+    </data>
+</openerp>
