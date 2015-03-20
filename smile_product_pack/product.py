@@ -47,7 +47,6 @@ class ProductProduct(orm.Model):
         for id in ids:
             if val and price != val[0].public_price or val and not val[0].public_price:
                 res[id] = price
-        print "00000000000000000000000000", str(res)
         return res
 
     _columns = {
@@ -76,11 +75,9 @@ class ProductProduct(orm.Model):
                 vals['list_price'] = 0
             else:
                 vals['pack_line_ids'][-1][2]['calc_price'] = True
-        print "1111111111111111111111111"
         return super(ProductProduct, self).create(cr, uid, vals, context=context)
 
     def write(self, cr, uid, ids, vals, context=None):
-        print "22222222222222222222"
         context = context or {}
         if isinstance(ids, (int, long)):
             ids = [ids]
