@@ -21,6 +21,7 @@
 
 import csv
 import base64
+import cStringIO
 
 from openerp import models, fields, api
 from openerp.tools import ustr
@@ -35,8 +36,8 @@ class SmileCsv2xmlConverter(models.Model):
     object_id = fields.Many2one("ir.model", "Object", required=True)
     domain = fields.Char("Domain", default="[ ]", required=True)
     field_ids = fields.Many2many("ir.model.fields")
-    model_xml = fields.Text("Modele XML", required=True, default=" a ")
-    model_xml2 = fields.Text("Modele XML", required=True, default=" b ")
+    model_xml = fields.Text("Modele XML", required=True, default=" / ")
+    model_xml2 = fields.Text("Modele XML", required=True, default=" / ")
     xml_file = fields.Binary("xml file")
     file_origin = fields.Binary("file origin")
 
@@ -55,19 +56,27 @@ class SmileCsv2xmlConverter(models.Model):
         xml_fields = []
         object_field = {}
         decoded = base64.decodestring(self.file_origin)
+        csv_input = cStringIO.StringIO(decoded)
+        csv_read = csv.reader(csv_input)
+        fieldnameline = csv_read.next()
+        field_names = []
+        for i in fieldnameline:
+            print "BEFORESPLIT", i
+            splitted = i.split('/', 1)
+            field_names.append(splitted[0])
+        print field_names
         newcsv = open("newcsv.csv", "w+")
         newcsv.write(decoded)
         newcsv.close()
-        csv_line = (csv.DictReader(open("newcsv.csv")))
+        csv_line = (csv.DictReader(open("newcsv.csv"), fieldnames=field_names))
         for field in self.field_ids:
             object_field.update({field.name: field.ttype})
             xml_fields.append(field.name)
 
         self.csv_result = self.get_xml_record(xml_fields, csv_line, object_field)
 
-    @api.multi
-    def fieldGeneration(self):
-        self.ensure_one()
+    @api.onchange('fields_ids')
+    def onchange_fields_ids(self):
         model_xml = "<record id='##?##' model='##?##'>\n"
         for field in self.field_ids:
             if (field.ttype == "function" or field.ttype == "related" or field.name == "id"):

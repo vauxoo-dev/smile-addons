@@ -23,7 +23,7 @@
     "name": "smile_csv2xml_converter",
     "version": "0.1",
     "depends": ['base'],
-    "author": "Manh",
+    "author": "Smile",
     "description": """
     This module allows users to generate an xml file based on the selected object or an uploaded csv file.
     They can choose what fields are going to be generated. The data are filled with the csv file

@@ -53,7 +53,9 @@ class WizardUpload(models.TransientModel):
         self.env['smile.csv2xml.converter'].browse(csv2xml_converter.id).write({'file_origin': ustr(csv_file)})
         line = csv_read.next()
         for i in line:
-            listCSV.append(i)
+            splitted = i.split('/', 1)
+            print splitted
+            listCSV.append(splitted[0])
         for field in csv2xml_converter.object_id.field_id:
             listOBJ.append(field.name)
         diff = list(set(listCSV) - set(listOBJ))

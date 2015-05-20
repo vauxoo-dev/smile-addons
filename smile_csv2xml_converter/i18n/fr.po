@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 8.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 15:28+0000\n"
-"PO-Revision-Date: 2014-10-03 15:28+0000\n"
+"POT-Creation-Date: 2015-05-18 10:47+0000\n"
+"PO-Revision-Date: 2015-05-18 10:47+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,17 +16,19 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: smile_csv2xml_converter
-#: model:ir.ui.menu,name:smile_csv2xml_converter.menu_smile_csv2xml_converter
-msgid "Converter"
-msgstr "Converter"
+#: field:wizard.upload,csv_file:0
+msgid "CSV File"
+msgstr "Fichier CSV"
 
 #. module: smile_csv2xml_converter
-#: field:smile_csv2xml_converter,create_uid:0
+#: field:smile.csv2xml.converter,create_uid:0
+#: field:wizard.upload,create_uid:0
 msgid "Created by"
 msgstr "Crée par"
 
 #. module: smile_csv2xml_converter
-#: field:smile_csv2xml_converter,create_date:0
+#: field:smile.csv2xml.converter,create_date:0
+#: field:wizard.upload,create_date:0
 msgid "Created on"
 msgstr "Crée le"
 
@@ -36,44 +38,126 @@ msgid "Csv2XML"
 msgstr "Csv2XML"
 
 #. module: smile_csv2xml_converter
-#: field:smile_csv2xml_converter,domain:0
+#: model:ir.ui.menu,name:smile_csv2xml_converter.menu_smile_csv2xml_converter
+msgid "Csv2xml"
+msgstr "Csv2xml"
+
+#. module: smile_csv2xml_converter
+#: field:wizard.upload,csv2xml_converter_id:0
+msgid "Csv2xml converter id"
+msgstr "Csv2xml converter id"
+
+#. module: smile_csv2xml_converter
+#: code:addons/smile_csv2xml_converter/wizard/wizard_upload.py:85
+#, python-format
+msgid "Difference between CSV file and object"
+msgstr "Différence entre le fichier CSV et l'objet'"
+
+#. module: smile_csv2xml_converter
+#: field:smile.csv2xml.converter,domain:0
 msgid "Domain"
 msgstr "Domaine"
 
 #. module: smile_csv2xml_converter
-#: field:smile_csv2xml_converter,id:0
+#: field:smile.csv2xml.converter,field_ids:0
+msgid "Field ids"
+msgstr "Field ids"
+
+#. module: smile_csv2xml_converter
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
+msgid "Fields"
+msgstr "Champs"
+
+#. module: smile_csv2xml_converter
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
+msgid "Generate XML"
+msgstr "Générer le XML"
+
+#. module: smile_csv2xml_converter
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
+msgid "Generate fields from CSV"
+msgstr "Générer les champs à partir du CSV"
+
+#. module: smile_csv2xml_converter
+#: field:smile.csv2xml.converter,id:0
+#: field:wizard.upload,id:0
 msgid "ID"
 msgstr "ID"
 
 #. module: smile_csv2xml_converter
-#: field:smile_csv2xml_converter,write_uid:0
+#: field:smile.csv2xml.converter,write_uid:0
+#: field:wizard.upload,write_uid:0
 msgid "Last Updated by"
-msgstr "Dernière mise à jour par"
+msgstr "Dernière modification par"
 
 #. module: smile_csv2xml_converter
-#: field:smile_csv2xml_converter,write_date:0
+#: field:smile.csv2xml.converter,write_date:0
+#: field:wizard.upload,write_date:0
 msgid "Last Updated on"
-msgstr "Dernière mise à jour fait le"
+msgstr "Dernière modification le"
 
 #. module: smile_csv2xml_converter
-#: view:smile_csv2xml_converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
-#: field:smile_csv2xml_converter,model_xml:0
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
+msgid "Model filled"
+msgstr "Modèle rempli"
+
+#. module: smile_csv2xml_converter
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
+msgid "Model generation"
+msgstr "Génération du modèle"
+
+#. module: smile_csv2xml_converter
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
+#: field:smile.csv2xml.converter,model_xml:0
+#: field:smile.csv2xml.converter,model_xml2:0
 msgid "Modele XML"
 msgstr "Modele XML"
 
 #. module: smile_csv2xml_converter
-#: field:smile_csv2xml_converter,name:0
+#: field:smile.csv2xml.converter,name:0
 msgid "Name"
 msgstr "Nom"
 
 #. module: smile_csv2xml_converter
-#: field:smile_csv2xml_converter,object:0
+#: field:smile.csv2xml.converter,object_id:0
 msgid "Object"
 msgstr "Objet"
 
 #. module: smile_csv2xml_converter
-#: view:smile_csv2xml_converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
-#: view:smile_csv2xml_converter:smile_csv2xml_converter.view_smile_csv2xml_converter_search>
-#: view:smile_csv2xml_converter:smile_csv2xml_converter.view_smile_csv2xml_converter_tree
+#: model:ir.actions.act_window,name:smile_csv2xml_converter.action_wizard_upload
+msgid "Upload CSV file"
+msgstr "Charger fichier CSV"
+
+#. module: smile_csv2xml_converter
+#: view:wizard.upload:smile_csv2xml_converter.view_wizard_upload
+msgid "Upload here your CSV file"
+msgstr "Charger ici votre fichier CSV"
+
+#. module: smile_csv2xml_converter
+#: model:ir.model,name:smile_csv2xml_converter.model_wizard_upload
+msgid "Wizard to upload a CSV file and fill XML model"
+msgstr "Assistant pour charget votre fichier CSV et remplir le modèle"
+
+#. module: smile_csv2xml_converter
+#: field:smile.csv2xml.converter,file_origin:0
+msgid "file origin"
+msgstr "FIchier d'origine
+'"
+
+#. module: smile_csv2xml_converter
+#: view:wizard.upload:smile_csv2xml_converter.view_wizard_upload
+msgid "fill with csv"
+msgstr "Remplir avec le fichier CSV"
+
+#. module: smile_csv2xml_converter
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_form
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_search>
+#: view:smile.csv2xml.converter:smile_csv2xml_converter.view_smile_csv2xml_converter_tree
 msgid "smile_csv2xml_converter"
 msgstr "smile_csv2xml_converter"
+
+#. module: smile_csv2xml_converter
+#: field:smile.csv2xml.converter,xml_file:0
+msgid "xml file"
+msgstr "xml file"
+
