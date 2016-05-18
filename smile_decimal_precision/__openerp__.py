@@ -32,7 +32,7 @@
     "data": [
         "views/decimal_precision_view.xml",
     ],
-    "auto_install": True,
+    "auto_install": False,
     "installable": True,
     "application": False,
 }

@@ -36,7 +36,7 @@ Feature
     "data": [
         "views/template.xml",
     ],
-    "auto_install": True,
+    "auto_install": False,
     "installable": True,
     "application": False,
 }
