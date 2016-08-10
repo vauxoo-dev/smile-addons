@@ -39,5 +39,4 @@
     'demo_xml': [],
     'test': [],
     'installable': True,
-    'active': False,
 }

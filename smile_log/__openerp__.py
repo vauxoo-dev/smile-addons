@@ -45,5 +45,4 @@ Suggestions & Feedback to: xavier.fernandez@smile.fr, corentin.pouhet-brunerie@s
         "views/smile_log_view.xml",
     ],
     "installable": True,
-    "active": False,
 }

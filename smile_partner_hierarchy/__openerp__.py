@@ -45,6 +45,5 @@ Suggestions & Feedback to: samir.rachedi@smile.fr
     "demo": [],
     "test": [],
     "installable": True,
-    "active": False,
     "certificate": '',
 }

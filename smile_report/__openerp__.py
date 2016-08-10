@@ -54,5 +54,4 @@ Development
     ],
     'demo': [],
     'installable': False,
-    'active': False,
 }

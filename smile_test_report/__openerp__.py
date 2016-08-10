@@ -53,5 +53,4 @@ TODO
     ],
     "demo": [],
     "installable": True,
-    "active": False,
 }

@@ -40,5 +40,4 @@ Suggestions & Feedback to: xavier.fernandez@smile.fr, corentin.pouhet-brunerie@s
         "views/script_view.xml",
     ],
     "installable": True,
-    "active": False,
 }

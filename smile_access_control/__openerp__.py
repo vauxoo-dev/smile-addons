@@ -51,5 +51,4 @@ Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr & matthieu.choplin@
     ],
     "demo": [],
     "installable": True,
-    "active": False,
 }

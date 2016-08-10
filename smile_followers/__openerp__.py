@@ -67,5 +67,4 @@ Suggestions & Feedback to: isabelle.richard@smile.fr & corentin.pouhet-brunerie@
     ],
     "demo": [],
     "installable": True,
-    "active": False,
 }

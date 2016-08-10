@@ -46,5 +46,4 @@ Suggestions & Feedback to: corentin.pouhet-brunerie@smile.fr
         'views/stock_view.xml',
     ],
     "installable": True,
-    "active": False,
 }
