@@ -53,6 +53,6 @@ Development
         'report/report.xml',
     ],
     'demo': [],
-    'installable': True,
+    'installable': False,
     'active': False,
 }
