@@ -21,7 +21,7 @@
 
 {
     "name": "Access Control",
-    "version": "1.0",
+    "version": "8.0.1.0.0",
     "author": "Smile",
     "website": 'http://www.smile.fr',
     "license": 'AGPL-3',
