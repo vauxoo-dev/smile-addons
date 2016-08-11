@@ -78,8 +78,10 @@ class ResGroups(models.Model):
             for item in vals['implied_ids']:
                 if item[0] == 6:
                     for group in self:
-                        group_ids_to_unlink.extend(list(set(group.implied_ids.ids) - set(item[2])))
-                        group_ids_to_link.extend(list(set(item[2]) - set(group.implied_ids.ids)))
+                        group_ids_to_unlink.extend(
+                            list(set(group.implied_ids.ids) - set(item[2])))
+                        group_ids_to_link.extend(
+                            list(set(item[2]) - set(group.implied_ids.ids)))
                 elif item[0] == 5:
                     group_ids_to_unlink.extend(item[1])
                 elif item[0] == 4:
@@ -89,20 +91,27 @@ class ResGroups(models.Model):
         res = super(ResGroups, self).write(vals)
         self._update_users(vals)
         if vals.get('implied_ids'):
-            # Update group for all users depending of this group, in order to add new implied groups to their groups
+            # Update group for all users depending of this group, in order to
+            # add new implied groups to their groups
             for group in self:
-                groups_id = [(4, subgroup_id) for subgroup_id in group_ids_to_link] + \
+                groups_id = \
+                    [(4, subgroup_id) for subgroup_id in group_ids_to_link] + \
                     [(3, subgroup_id) for subgroup_id in group_ids_to_unlink]
-                group.with_context(active_test=False).users.write({'groups_id': groups_id})
+                group.with_context(active_test=False).users.write(
+                    {'groups_id': groups_id})
         return res
 
     @api.multi
     def button_complete_access_controls(self):
-        """Create access rules for the first level relation models of access rule models not only in readonly"""
+        """ Create access rules for the first level relation models of access
+        rule models not only in readonly """
         access_obj = self.env['ir.model.access']
         for group in self:
-            models = group.model_access.filtered(lambda rule: rule.perm_write or rule.perm_create or rule.perm_unlink).mapped('model_id')
-            for model in models._get_relations(self._context.get('relations_level', 1)):
+            ir_models = group.model_access.filtered(
+                lambda rule: rule.perm_write or rule.perm_create or
+                rule.perm_unlink).mapped('model_id')
+            for model in ir_models._get_relations(
+                    self._context.get('relations_level', 1)):
                 access_obj.create({
                     'name': '%s %s' % (model.model, group.name),
                     'model_id': model.id,
